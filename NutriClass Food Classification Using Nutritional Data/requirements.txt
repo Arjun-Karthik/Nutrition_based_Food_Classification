@@ -1,8 +1,8 @@
-streamlit
-pandas
-scikit-learn
-xgboost
-imbalanced-learn
-joblib
-plotly
+streamlit==1.33.0
+pandas==2.2.2
+scikit-learn==1.4.2
+plotly==5.21.0
+xgboost==2.0.3
+imbalanced-learn==0.12.2
+joblib==1.4.2
 
