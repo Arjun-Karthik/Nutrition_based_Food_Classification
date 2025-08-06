@@ -37,16 +37,16 @@
   
 5. Evaluation & Insights
    
-      Evaluated models based on:
-       - Accuracy
-       - Precision
-       - Recall
-       - F1-score
-       - Confusion Matrix
-      Also compared:
-       - Model performances side-by-side
-       - Feature importance and contribution
-       - Visualization of prediction behaviors
+      - Evaluated models based on:
+        - Accuracy
+        - Precision
+        - Recall
+        - F1-score
+        - Confusion Matrix
+      - Also compared:
+        - Model performances side-by-side
+        - Feature importance and contribution
+        - Visualization of prediction behaviors
 
 ## ▶️ Running the App
 
