@@ -38,15 +38,15 @@
 5. Evaluation & Insights
    
       Evaluated models based on:
-           - Accuracy
-           - Precision
-           - Recall
-           - F1-score
-           - Confusion Matrix
+        - Accuracy
+        - Precision
+        - Recall
+        - F1-score
+        - Confusion Matrix
       Also compared:
-           - Model performances side-by-side
-           - Feature importance and contribution
-           - Visualization of prediction behaviors
+        - Model performances side-by-side
+        - Feature importance and contribution
+        - Visualization of prediction behaviors
 
 ## ▶️ Running the App
 
@@ -71,9 +71,9 @@ Ensure Python 3.8+ is installed.
    - Automated preprocessing and encoding
    - Support for model comparison and performance benchmarking
    - Visual analytics for:
-          - Class distribution
-          - Feature importance
-          - Confusion matrix, precision-recall, etc.
+      - Class distribution
+      - Feature importance
+      - Confusion matrix, precision-recall, etc.
    - Educational insights into food and health using ML
 
 ## ✅ Requirements
@@ -95,8 +95,16 @@ Install all with:
 
 ### 📊 Top 10 Most Volatile Stocks and 📈 Cumulative Return Over Time
 
-<img src="Screenshots/Bar and Line Chart.png" width="800"/>
+<img src="Screenshots/Model Metrics.png" width="800"/>
 
 ### 📊 Sector-wise Performance
 
-<img src="Screenshots/Bar Chart.png" width="800"/>
+<img src="Screenshots/PCA Visualization.png" width="800"/>
+
+## 🎥 Demo Video
+
+   <a href="https://www.linkedin.com/posts/arjun-t-a51383200_stock-performance-dashboard-visualization-activity-7356235958826012672-QRSc?utm_source=share&utm_medium=member_desktop&rcm=ACoAADNQBh0BQsEphYCjQb01l17Z8-pUyINZuxs">NutriClass: Food Classification Using Nutritional Data Demo Video</a>
+
+## 📃 License
+
+   This project is licensed under the MIT License – see the LICENSE file for details.
