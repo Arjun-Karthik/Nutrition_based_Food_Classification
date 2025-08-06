@@ -1,1 +1,102 @@
-# Nutrition_based_Food_Classification
+# 🥗 NutriClass: Food Classification Using Nutritional Data
+
+## ⚙️ Workflow
+1. Data Understanding
+   
+   - Loaded a tabular dataset containing food nutrition information.
+   - Inspected:
+     - Class distribution
+     - Sample entries
+     - Dataset size and balance
+     - Noise and inconsistencies
+
+2. Data Preprocessing
+   
+     - Handled missing values through imputation or row removal.
+     - Removed duplicates to prevent skewed learning.
+     - Detected and treated outliers in features like calories or sugar.
+     - Normalized/standardized numerical features to ensure model stability.
+
+3. Feature Engineering
+
+     - Applied Label Encoding / One-Hot Encoding for categorical targets.
+     - Explored PCA / feature selection techniques to reduce dimensionality.
+     - Finalized a cleaned, well-prepared dataset for training.
+
+4. Model Selection & Training
+   
+     - Trained and compared multiple models:
+           - Logistic Regression
+           - Decision Tree
+           - Random Forest
+           - K-Nearest Neighbors
+           - Support Vector Machine
+           - XGBoost
+           - Gradient Boosting Classifier
+     - Used cross-validation to ensure robustness.
+  
+5. Evaluation & Insights
+   
+      Evaluated models based on:
+           - Accuracy
+           - Precision
+           - Recall
+           - F1-score
+           - Confusion Matrix
+      Also compared:
+           - Model performances side-by-side
+           - Feature importance and contribution
+           - Visualization of prediction behaviors
+
+## ▶️ Running the App
+
+Ensure Python 3.8+ is installed.
+
+1. Clone the repo:
+   
+       https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification
+       cd Nutrition_based_Food_Classification
+
+2.Install dependencies
+
+       pip install -r requirements.txt
+
+3. Run Streamlit app
+
+       streamlit run app.py
+
+## 🧩 Features
+
+   - Multi-class classification using nutritional content
+   - Automated preprocessing and encoding
+   - Support for model comparison and performance benchmarking
+   - Visual analytics for:
+          - Class distribution
+          - Feature importance
+          - Confusion matrix, precision-recall, etc.
+   - Educational insights into food and health using ML
+
+## ✅ Requirements
+
+   - streamlit
+   - pandas
+   - scikit-learn
+   - xgboost
+   - imblearn
+   - joblib
+   - matplotlib
+   - plotly
+
+Install all with:
+
+       pip install -r requirements.txt
+
+## 📸 Screenshots
+
+### 📊 Top 10 Most Volatile Stocks and 📈 Cumulative Return Over Time
+
+<img src="Screenshots/Bar and Line Chart.png" width="800"/>
+
+### 📊 Sector-wise Performance
+
+<img src="Screenshots/Bar Chart.png" width="800"/>
