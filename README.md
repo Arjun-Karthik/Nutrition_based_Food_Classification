@@ -103,7 +103,7 @@ Install all with:
 
 ## 🎥 Demo Video
 
-   <a href="https://www.linkedin.com/posts/arjun-t-a51383200_stock-performance-dashboard-visualization-activity-7356235958826012672-QRSc?utm_source=share&utm_medium=member_desktop&rcm=ACoAADNQBh0BQsEphYCjQb01l17Z8-pUyINZuxs">NutriClass: Food Classification Using Nutritional Data Demo Video</a>
+   <a href="https://www.linkedin.com/posts/arjun-t-a51383200_nutriclass-food-classification-using-nutritional-activity-7358768128262066178-qE4L?utm_source=share&utm_medium=member_desktop&rcm=ACoAADNQBh0BQsEphYCjQb01l17Z8-pUyINZuxs">NutriClass: Food Classification Using Nutritional Data Demo Video</a>
 
 ## 📃 License
 
