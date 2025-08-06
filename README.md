@@ -38,15 +38,15 @@
 5. Evaluation & Insights
    
       Evaluated models based on:
-        - Accuracy
-        - Precision
-        - Recall
-        - F1-score
-        - Confusion Matrix
+       - Accuracy
+       - Precision
+       - Recall
+       - F1-score
+       - Confusion Matrix
       Also compared:
-        - Model performances side-by-side
-        - Feature importance and contribution
-        - Visualization of prediction behaviors
+       - Model performances side-by-side
+       - Feature importance and contribution
+       - Visualization of prediction behaviors
 
 ## ▶️ Running the App
 
@@ -93,11 +93,11 @@ Install all with:
 
 ## 📸 Screenshots
 
-### 📊 Top 10 Most Volatile Stocks and 📈 Cumulative Return Over Time
+### 📊 Model Performance
 
 <img src="Screenshots/Model Metrics.png" width="800"/>
 
-### 📊 Sector-wise Performance
+### 🔵 PCA Visualization
 
 <img src="Screenshots/PCA Visualization.png" width="800"/>
 
