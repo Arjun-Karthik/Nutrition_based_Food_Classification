@@ -1,4 +1,4 @@
-# 🥗 NutriClass: Food Classification Using Nutritional Data
+# NutriClass: Food Classification Using Nutritional Data
 
 ## ⚙️ Workflow
 1. Data Understanding
@@ -26,13 +26,13 @@
 4. Model Selection & Training
    
      - Trained and compared multiple models:
-           - Logistic Regression
-           - Decision Tree
-           - Random Forest
-           - K-Nearest Neighbors
-           - Support Vector Machine
-           - XGBoost
-           - Gradient Boosting Classifier
+        - Logistic Regression
+        - Decision Tree
+        - Random Forest
+        - K-Nearest Neighbors
+        - Support Vector Machine
+        - XGBoost
+        - Gradient Boosting Classifier
      - Used cross-validation to ensure robustness.
   
 5. Evaluation & Insights
