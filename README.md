@@ -55,6 +55,7 @@ Ensure Python 3.8+ is installed.
 1. Clone the repo:
    
        https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification
+       cd Nutrition_based_Food_Classification
 
 2.Install dependencies
 
