@@ -150,7 +150,7 @@ st.plotly_chart(fig_pca, use_container_width=True)
 st.header("🧩 Confusion Matrix")
 selected_model = st.selectbox("Select Model to View Confusion Matrix", results_df['Model'])
 safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model)
-model_file = "Models/model_K-Nearest_Neighbors.pkl" if selected_model.strip() == "K-Nearest Neighbors" else f"Models/{safe_model_name}.pkl"
+model_file = "Models/K-Nearest_Neighbors.pkl" if selected_model.strip() == "K-Nearest Neighbors" else f"Models/{safe_model_name}.pkl"
 
 try:
     model = joblib.load(model_file)
@@ -225,3 +225,4 @@ with st.form("prediction_form"):
 
         except Exception as e:
             st.error(f"Prediction failed: {e}")
+
