@@ -47,7 +47,7 @@ def load_model(file_name):
 
 def get_classifier(model_name):
     safe_name = re.sub(r'[^a-zA-Z0-9]', '_', model_name)
-    model_file = "K-Nearest_Neighbors.pkl" if model_name.strip() == "K-Nearest Neighbors" else f"{safe_name}.pkl"
+    model_file = "Models/K-Nearest_Neighbors.pkl" if model_name.strip() == "K-Nearest Neighbors" else f"Models/{safe_name}.pkl"
     return load_model(model_file)
 
 # -------------------- LOAD DATA --------------------
@@ -223,3 +223,4 @@ with st.form("prediction_form"):
         pred_df = pd.DataFrame(all_predictions).set_index("Model")
         st.subheader("📊 Predictions from All Models")
         st.dataframe(pred_df.style.format({"Confidence (%)":"{:.2f}%"}).background_gradient(cmap="Greens"))
+
