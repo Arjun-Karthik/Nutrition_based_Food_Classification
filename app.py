@@ -35,11 +35,12 @@ def load_model_from_url(url, local_path):
 
 # Replace these URLs with your Hugging Face / Google Drive / S3 links
 model_urls = {
-    "logistic_regression": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/logistic_regression.pkl",
-    "random_forestclassifier": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/random_forestclassifier.pkl",
-    "decision_treeclassifier": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/decision_treeclassifier.pkl",
-    "k_nearest_neighbors": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/k_nearest_neighbors.pkl",
-    "svm": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/svm.pkl"
+    "logistic_regression": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/logistic_regression.pkl",
+    "random_forestclassifier": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/random_forest.pkl",
+    "decision_treeclassifier": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/decision_tree.pkl",
+    "k_nearest_neighbors": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/k-nearest_neighbors.pkl",
+    "svm": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/support_vector_machine.pkl",
+    "xgboost": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/xgboost.pkl"
 }
 
 # -------------------- LOAD DATA --------------------
