@@ -222,11 +222,10 @@ with st.form("prediction_form"):
 
             for model_name in model_list:
                 safe_name = re.sub(r'[^a-zA-Z0-9]', '_', model_name)
-                model_url = MODEL_URLS.get(model_name)
-                model_file = f"Models/{safe_name}.pkl"
+                model_file = "Models/K-Nearest_Neighbors.pkl" if model_name.strip() == "K-Nearest Neighbors" else f"Models/{safe_name}.pkl"
 
                 try:
-                    clf = load_model_from_url(model_url, model_file)
+                    clf = joblib.load(model_file)
                     pred_class = clf.predict(input_pca)[0]
 
                     confidence = None
