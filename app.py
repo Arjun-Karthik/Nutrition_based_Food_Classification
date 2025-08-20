@@ -214,6 +214,7 @@ with st.form("prediction_form"):
             input_df = pd.get_dummies(input_df, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
             input_df = input_df.reindex(columns=scaler.feature_names_in_, fill_value=0)
 
+            scaler = joblib.load("Models/scaler.pkl")
             input_scaled = scaler.transform(input_df)
             input_pca = pca.transform(input_scaled)
 
