@@ -34,10 +34,12 @@ def load_model_from_url(url, local_path):
     return joblib.load(local_path)
 
 # Replace these URLs with your Hugging Face / Google Drive / S3 links
-MODEL_URLS = {
-    "K-Nearest Neighbors": "https://huggingface.co/yourname/nutriclass-models/resolve/main/K-Nearest_Neighbors.pkl",
-    "Random Forest": "https://huggingface.co/yourname/nutriclass-models/resolve/main/Random_Forest.pkl",
-    "Decision Tree": "https://huggingface.co/yourname/nutriclass-models/resolve/main/Decision_Tree.pkl",
+model_urls = {
+    "logistic_regression": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/logistic_regression.pkl",
+    "random_forestclassifier": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/random_forestclassifier.pkl",
+    "decision_treeclassifier": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/decision_treeclassifier.pkl",
+    "k_nearest_neighbors": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/k_nearest_neighbors.pkl",
+    "svm": "https://raw.githubusercontent.com/YourUser/YourRepo/main/Models/svm.pkl"
 }
 
 # -------------------- LOAD DATA --------------------
@@ -169,8 +171,17 @@ st.plotly_chart(fig_pca, use_container_width=True)
 st.header("🧩 Confusion Matrix")
 selected_model = st.selectbox("Select Model to View Confusion Matrix", results_df['Model'])
 safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model)
-model_url = MODEL_URLS.get(selected_model)
+url = model_urls.get(safe_model_name.lower())
 model_file = f"Models/{safe_model_name}.pkl"
+
+if url:
+    if not os.path.exists(model_file):
+        response = requests.get(url)
+        with open(model_file, "wb") as f:
+            f.write(response.content)
+else:
+    st.error(f"No URL found for {safe_model_name}. Please add it to model_urls.")
+
 
 try:
     loaded_model = load_model_from_url(model_url, model_file)
