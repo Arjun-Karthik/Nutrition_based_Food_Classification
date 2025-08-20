@@ -149,26 +149,31 @@ safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model)
 model_file = "Models/K-Nearest_Neighbors.pkl" if selected_model.strip() == "K-Nearest Neighbors" else f"Models/{safe_model_name}.pkl"
 
 try:
+    # ✅ Load model & preprocessors with joblib
     loaded_model = joblib.load(model_file)
     scaler = joblib.load("Models/scaler.pkl")
     pca = joblib.load("Models/pca.pkl")
     le = joblib.load("Models/label_encoder.pkl")
 
+    # Prepare data
     df_y = load_data().dropna().drop_duplicates()
     df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
     df_y['Is_Gluten_Free'] = df_y['Is_Gluten_Free'].astype(int)
     df_y = pd.get_dummies(df_y, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
+
     X = df_y.drop(columns=['Food_Name']).reindex(columns=scaler.feature_names_in_, fill_value=0)
 
     X_scaled = scaler.transform(X)
     X_pca = pca.transform(X_scaled)
-    y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
+
+    y = le.transform(load_data().dropna().drop_duplicates()['Food_Name'])
     y_pred = loaded_model.predict(X_pca)
 
+    # Confusion matrix
     cm = confusion_matrix(y, y_pred)
     fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
                        labels=dict(x="Predicted", y="Actual", color="Count"),
-                       x=le_cm.classes_, y=le_cm.classes_,
+                       x=le.classes_, y=le.classes_,
                        title=f"Confusion Matrix - {selected_model}")
     st.plotly_chart(fig_cm, use_container_width=True)
 
