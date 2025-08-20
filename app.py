@@ -171,45 +171,40 @@ st.plotly_chart(fig_pca, use_container_width=True)
 # -------------------- CONFUSION MATRIX --------------------
 st.header("🧩 Confusion Matrix")
 selected_model = st.selectbox("Select Model to View Confusion Matrix", results_df['Model'])
-safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model)
-url = model_urls.get(safe_model_name.lower())
+safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model).lower()
+
+url = model_urls.get(safe_model_name)
 model_file = f"Models/{safe_model_name}.pkl"
 
 if url:
-    if not os.path.exists(model_file):
-        response = requests.get(url)
-        with open(model_file, "wb") as f:
-            f.write(response.content)
+    try:
+        loaded_model = load_model_from_url(url, model_file)
+        scaler = joblib.load("Models/scaler.pkl")
+        pca = joblib.load("Models/pca.pkl")
+        le = joblib.load("Models/label_encoder.pkl")
+
+        df_y = load_data().dropna().drop_duplicates()
+        df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
+        df_y['Is_Gluten_Free'] = df_y['Is_Gluten_Free'].astype(int)
+        df_y = pd.get_dummies(df_y, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
+        X = df_y.drop(columns=['Food_Name']).reindex(columns=scaler.feature_names_in_, fill_value=0)
+
+        X_scaled = scaler.transform(X)
+        X_pca = pca.transform(X_scaled)
+        y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
+        y_pred = loaded_model.predict(X_pca)
+
+        cm = confusion_matrix(y, y_pred)
+        fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
+                           labels=dict(x="Predicted", y="Actual", color="Count"),
+                           x=le_cm.classes_, y=le_cm.classes_,
+                           title=f"Confusion Matrix - {selected_model}")
+        st.plotly_chart(fig_cm, use_container_width=True)
+
+    except Exception as e:
+        st.error(f"Model load failed for {selected_model}: {e}")
 else:
     st.error(f"No URL found for {safe_model_name}. Please add it to model_urls.")
-
-
-try:
-    loaded_model = load_model_from_url(model_url, model_file)
-    scaler = joblib.load("Models/scaler.pkl")
-    pca = joblib.load("Models/pca.pkl")
-    le = joblib.load("Models/label_encoder.pkl")
-
-    df_y = load_data().dropna().drop_duplicates()
-    df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
-    df_y['Is_Gluten_Free'] = df_y['Is_Gluten_Free'].astype(int)
-    df_y = pd.get_dummies(df_y, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
-    X = df_y.drop(columns=['Food_Name']).reindex(columns=scaler.feature_names_in_, fill_value=0)
-
-    X_scaled = scaler.transform(X)
-    X_pca = pca.transform(X_scaled)
-    y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
-    y_pred = loaded_model.predict(X_pca)
-
-    cm = confusion_matrix(y, y_pred)
-    fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
-                       labels=dict(x="Predicted", y="Actual", color="Count"),
-                       x=le_cm.classes_, y=le_cm.classes_,
-                       title=f"Confusion Matrix - {selected_model}")
-    st.plotly_chart(fig_cm, use_container_width=True)
-
-except Exception as e:
-    st.error(f"Model load failed for {selected_model}: {e}")
 
 # -------------------- PREDICTION SECTION --------------------
 st.header("🎯 Try Prediction")
