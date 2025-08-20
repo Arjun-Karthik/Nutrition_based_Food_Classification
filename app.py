@@ -19,30 +19,6 @@ st.markdown("""<h1 style = 'text-align:center;'>🍵 NutriClass - Food Classific
                 <hr style='border-top: 3px solid #bbb;'>""", 
                 unsafe_allow_html=True)
 
-# -------------------- MODEL DOWNLOAD HELPER --------------------
-def load_model_from_url(url, local_path):
-    """
-    Download model from URL if not already cached locally.
-    """
-    if not os.path.exists(local_path):
-        os.makedirs(os.path.dirname(local_path), exist_ok=True)
-        with st.spinner(f"Downloading {os.path.basename(local_path)}..."):
-            response = requests.get(url)
-            response.raise_for_status()
-            with open(local_path, "wb") as f:
-                f.write(response.content)
-    return joblib.load(local_path)
-
-# Replace these URLs with your Hugging Face / Google Drive / S3 links
-model_urls = {
-    "logistic_regression": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/logistic_regression.pkl",
-    "random_forestclassifier": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/random_forest.pkl",
-    "decision_treeclassifier": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/decision_tree.pkl",
-    "k_nearest_neighbors": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/k-nearest_neighbors.pkl",
-    "svm": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/support_vector_machine.pkl",
-    "xgboost": "https://github.com/Arjun-Karthik/Nutrition_based_Food_Classification/blob/main/Models/xgboost.pkl"
-}
-
 # -------------------- LOAD DATA --------------------
 @st.cache_data
 def load_data():
@@ -171,40 +147,35 @@ st.plotly_chart(fig_pca, use_container_width=True)
 # -------------------- CONFUSION MATRIX --------------------
 st.header("🧩 Confusion Matrix")
 selected_model = st.selectbox("Select Model to View Confusion Matrix", results_df['Model'])
-safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model).lower()
+safe_model_name = re.sub(r'[^a-zA-Z0-9]', '_', selected_model)
+model_file = "Models/K-Nearest_Neighbors.pkl" if selected_model.strip() == "K-Nearest Neighbors" else f"Models/{safe_model_name}.pkl"
 
-url = model_urls.get(safe_model_name)
-model_file = f"Models/{safe_model_name}.pkl"
+try:
+    loaded_model = joblib.load(model_file)
+    scaler = joblib.load("Models/scaler.pkl")
+    pca = joblib.load("Models/pca.pkl")
+    le = joblib.load("Models/label_encoder.pkl")
 
-if url:
-    try:
-        loaded_model = load_model_from_url(url, model_file)
-        scaler = joblib.load("Models/scaler.pkl")
-        pca = joblib.load("Models/pca.pkl")
-        le = joblib.load("Models/label_encoder.pkl")
+    df_y = load_data().dropna().drop_duplicates()
+    df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
+    df_y['Is_Gluten_Free'] = df_y['Is_Gluten_Free'].astype(int)
+    df_y = pd.get_dummies(df_y, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
+    X = df_y.drop(columns=['Food_Name']).reindex(columns=scaler.feature_names_in_, fill_value=0)
 
-        df_y = load_data().dropna().drop_duplicates()
-        df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
-        df_y['Is_Gluten_Free'] = df_y['Is_Gluten_Free'].astype(int)
-        df_y = pd.get_dummies(df_y, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
-        X = df_y.drop(columns=['Food_Name']).reindex(columns=scaler.feature_names_in_, fill_value=0)
+    X_scaled = scaler.transform(X)
+    X_pca = pca.transform(X_scaled)
+    y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
+    y_pred = loaded_model.predict(X_pca)
 
-        X_scaled = scaler.transform(X)
-        X_pca = pca.transform(X_scaled)
-        y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
-        y_pred = loaded_model.predict(X_pca)
+    cm = confusion_matrix(y, y_pred)
+    fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
+                       labels=dict(x="Predicted", y="Actual", color="Count"),
+                       x=le_cm.classes_, y=le_cm.classes_,
+                       title=f"Confusion Matrix - {selected_model}")
+    st.plotly_chart(fig_cm, use_container_width=True)
 
-        cm = confusion_matrix(y, y_pred)
-        fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
-                           labels=dict(x="Predicted", y="Actual", color="Count"),
-                           x=le_cm.classes_, y=le_cm.classes_,
-                           title=f"Confusion Matrix - {selected_model}")
-        st.plotly_chart(fig_cm, use_container_width=True)
-
-    except Exception as e:
-        st.error(f"Model load failed for {selected_model}: {e}")
-else:
-    st.error(f"No URL found for {safe_model_name}. Please add it to model_urls.")
+except FileNotFoundError:
+    st.error(f"Model file not found for {selected_model}.")
 
 # -------------------- PREDICTION SECTION --------------------
 st.header("🎯 Try Prediction")
