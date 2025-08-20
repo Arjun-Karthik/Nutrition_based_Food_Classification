@@ -6,7 +6,6 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 import joblib
-import pickle
 import os
 import re
 
@@ -30,24 +29,20 @@ def load_data(file_path):
 
 @st.cache_resource
 def load_model(file_name):
+    """Load model only using joblib"""
     path = os.path.join(MODEL_DIR, file_name)
     if not os.path.exists(path):
         st.error(f"Model file not found: {file_name}")
         return None
     try:
-        # Prefer joblib for sklearn models, fallback to pickle
-        try:
-            return joblib.load(path)
-        except Exception:
-            with open(path, "rb") as f:
-                return pickle.load(f)
+        return joblib.load(path)
     except Exception as e:
         st.error(f"Failed to load {file_name}: {type(e).__name__} - {e}")
         return None
 
 def get_classifier(model_name):
     safe_name = re.sub(r'[^a-zA-Z0-9]', '_', model_name)
-    model_file = "Models/K-Nearest_Neighbors.pkl" if model_name.strip() == "K-Nearest Neighbors" else f"Models/{safe_name}.pkl"
+    model_file = "K-Nearest_Neighbors.pkl" if model_name.strip() == "K-Nearest Neighbors" else f"{safe_name}.pkl"
     return load_model(model_file)
 
 # -------------------- LOAD DATA --------------------
@@ -223,4 +218,3 @@ with st.form("prediction_form"):
         pred_df = pd.DataFrame(all_predictions).set_index("Model")
         st.subheader("📊 Predictions from All Models")
         st.dataframe(pred_df.style.format({"Confidence (%)":"{:.2f}%"}).background_gradient(cmap="Greens"))
-
