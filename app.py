@@ -265,7 +265,7 @@ with st.form("prediction_form"):
                     all_predictions.append({
                         "Model": model_name,
                         "Prediction": pred_label,
-                        "Confidence (%)": round(confidence, 2) if confidence is not None else None
+                        "Confidence (%)": round(confidence, 2) if confidence is not None else N/A
                     })
 
                 except Exception as e:
