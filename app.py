@@ -7,8 +7,6 @@ from imblearn.over_sampling import SMOTE
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix
 import re
-import os
-import requests
 
 # -------------------- STREAMLIT CONFIG --------------------
 st.set_page_config(page_title="NutriClass Visualizer", 
@@ -25,6 +23,21 @@ def load_data():
     return pd.read_csv("synthetic_food_dataset_imbalanced.csv")
 
 df_raw = load_data()
+
+# -------------------- LOAD PREPROCESSORS --------------------
+@st.cache_resource
+def load_preprocessors():
+    """Load scaler, PCA, and label encoder"""
+    scaler = joblib.load("Models/scaler.pkl")
+    pca = joblib.load("Models/pca.pkl")
+    le = joblib.load("Models/label_encoder.pkl")
+    return scaler, pca, le
+
+try:
+    scaler, pca, le = load_preprocessors()
+except Exception as e:
+    st.error(f"Failed to load preprocessors: {e}")
+    st.stop()
 
 # -------------------- DATASET DIAGNOSTICS --------------------
 st.markdown("<h2 style = text-align:center;>📋 Dataset Diagnostics</h2>", unsafe_allow_html=True)
@@ -133,12 +146,11 @@ df_example['Is_Gluten_Free'] = df_example['Is_Gluten_Free'].astype(int)
 
 scaler_for_pca = StandardScaler()
 X_scaled = scaler_for_pca.fit_transform(df_example)
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X_scaled)
+pca_obj = PCA(n_components=2)
+X_pca = pca_obj.fit_transform(X_scaled)
 
 pca_df = pd.DataFrame(X_pca, columns=['PC1', 'PC2'])
-le_cm = joblib.load("Models/label_encoder.pkl")
-pca_df['Label'] = le_cm.fit_transform(load_data().dropna().drop_duplicates()['Food_Name'])
+pca_df['Label'] = le.fit_transform(load_data().dropna().drop_duplicates()['Food_Name'])
 
 fig_pca = px.scatter(pca_df, x='PC1', y='PC2', color=pca_df['Label'].astype(str),
                      title="🔵 PCA - Nutritional Feature Reduction (2D)")
@@ -152,9 +164,6 @@ model_file = "Models/K-Nearest_Neighbors.pkl" if selected_model.strip() == "K-Ne
 
 try:
     loaded_model = joblib.load(model_file)
-    scaler = joblib.load("Models/scaler.pkl")
-    pca = joblib.load("Models/pca.pkl")
-    le = joblib.load("Models/label_encoder.pkl")
 
     df_y = load_data().dropna().drop_duplicates()
     df_y['Is_Vegan'] = df_y['Is_Vegan'].astype(int)
@@ -164,13 +173,13 @@ try:
 
     X_scaled = scaler.transform(X)
     X_pca = pca.transform(X_scaled)
-    y = le_cm.transform(load_data().dropna().drop_duplicates()['Food_Name'])
+    y = le.transform(load_data().dropna().drop_duplicates()['Food_Name'])
     y_pred = loaded_model.predict(X_pca)
 
     cm = confusion_matrix(y, y_pred)
     fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
                        labels=dict(x="Predicted", y="Actual", color="Count"),
-                       x=le_cm.classes_, y=le_cm.classes_,
+                       x=le.classes_, y=le.classes_,
                        title=f"Confusion Matrix - {selected_model}")
     st.plotly_chart(fig_cm, use_container_width=True)
 
@@ -214,7 +223,6 @@ with st.form("prediction_form"):
             input_df = pd.get_dummies(input_df, columns=['Meal_Type', 'Preparation_Method'], drop_first=True)
             input_df = input_df.reindex(columns=scaler.feature_names_in_, fill_value=0)
 
-            scaler = joblib.load("Models/scaler.pkl")
             input_scaled = scaler.transform(input_df)
             input_pca = pca.transform(input_scaled)
 
@@ -235,10 +243,11 @@ with st.form("prediction_form"):
 
                     if hasattr(clf, "predict_proba"):
                         proba = clf.predict_proba(input_pca)[0]
-                        confidence = max(proba) * 100
+                        confidence = proba[pred_class] * 100
                         class_labels = le.inverse_transform(range(len(proba)))
                         probs_dict = {cls: round(p * 100, 2) for cls, p in zip(class_labels, proba)}
                         pred_label = le.inverse_transform([pred_class])[0]
+
                     elif hasattr(clf, "decision_function"):
                         decision = clf.decision_function(input_pca)
                         if decision.ndim > 1:
@@ -248,8 +257,10 @@ with st.form("prediction_form"):
                         else:
                             confidence = (abs(decision[0]) / (1 + abs(decision[0]))) * 100
                         pred_label = le.inverse_transform([pred_class])[0]
+
                     else:
                         pred_label = le.inverse_transform([pred_class])[0]
+                        confidence = None
 
                     all_predictions.append({
                         "Model": model_name,
