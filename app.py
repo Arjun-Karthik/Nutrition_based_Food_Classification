@@ -35,11 +35,12 @@ def load_model(file_name):
         st.error(f"Model file not found: {file_name}")
         return None
     try:
-        if file_name.endswith(".pkl"):
+        # Prefer joblib for sklearn models, fallback to pickle
+        try:
+            return joblib.load(path)
+        except Exception:
             with open(path, "rb") as f:
                 return pickle.load(f)
-        else:
-            return joblib.load(path)
     except Exception as e:
         st.error(f"Failed to load {file_name}: {type(e).__name__} - {e}")
         return None
@@ -55,7 +56,6 @@ df_raw = load_data(DATA_FILE)
 # -------------------- DATASET DIAGNOSTICS --------------------
 st.markdown("<h2 style=text-align:center;>📋 Dataset Diagnostics</h2>", unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
-
 with col1:
     st.markdown(f"<h5 style=text-align:center;>🔢 Original Shape: {df_raw.shape}</h5>", unsafe_allow_html=True)
 with col2:
@@ -64,7 +64,6 @@ with col2:
 with col3:
     df_raw = df_raw.drop_duplicates()
     st.markdown(f"<h5 style=text-align:center;>🧹 Shape After Removing Duplicates: {df_raw.shape}</h5>", unsafe_allow_html=True)
-
 st.markdown("<hr style='width:95%; border-top: 3px solid #bbb;'>", unsafe_allow_html=True)
 
 # -------------------- MISSING VALUES --------------------
@@ -80,19 +79,18 @@ st.subheader("📊 Data Overview")
 df_raw.index = range(1, len(df_raw)+1)
 st.dataframe(df_raw.head(10))
 
-# -------------------- EDA ANALYSIS --------------------
+# -------------------- EDA --------------------
 st.header("🔍 Exploratory Data Analysis (EDA)")
 numeric_cols = df_raw.select_dtypes(include=['float64', 'int64']).columns
 corr = df_raw[numeric_cols].corr()
 fig_corr = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu_r", title="📌 Correlation Heatmap")
 st.plotly_chart(fig_corr, use_container_width=True)
 
-# Class Distribution before and after SMOTE
+# Class distribution before & after SMOTE
 df_smote = df_raw.dropna()
 X = df_smote.drop(columns=['Food_Name'])
 y = df_smote['Food_Name']
 X_encoded = pd.get_dummies(X, drop_first=True)
-
 smote = SMOTE(random_state=42)
 X_resampled, y_resampled = smote.fit_resample(X_encoded, y)
 
@@ -121,13 +119,12 @@ st.dataframe(
         .style.format("{:.1f}%")
         .background_gradient(cmap="Blues", axis=0)
 )
-
 fig_bar = px.bar(sorted_results.melt(id_vars='Model'), x='Model', y='value', color='variable',
                  barmode='group', title='📈 Model Metrics Comparison',
                  labels={'value':'Percentage (%)','variable':'Metric'})
 st.plotly_chart(fig_bar, use_container_width=True)
 
-# -------------------- PCA VISUALIZATION --------------------
+# -------------------- PCA --------------------
 df_example = df_raw.dropna().drop_duplicates()
 df_example = pd.get_dummies(df_example, columns=['Meal_Type','Preparation_Method'], drop_first=True)
 df_example = df_example.drop(['Food_Name'], axis=1)
@@ -140,8 +137,6 @@ le = load_model("label_encoder.pkl")
 
 X_scaled = scaler.transform(df_example)
 X_pca = pca.transform(X_scaled)
-
-# Use only first 2 components for plotting
 pca_plot_df = pd.DataFrame(X_pca[:, :2], columns=['PC1', 'PC2'])
 pca_plot_df['Label'] = le.transform(df_raw.dropna().drop_duplicates()['Food_Name'])
 
@@ -164,7 +159,7 @@ if clf:
     X_pca_cm = pca.transform(X_scaled_cm)
     y_true = le.transform(df_raw.dropna().drop_duplicates()['Food_Name'])
     y_pred = clf.predict(X_pca_cm)
-    
+
     cm = confusion_matrix(y_true, y_pred)
     fig_cm = px.imshow(cm, text_auto=True, color_continuous_scale='Blues',
                        labels=dict(x="Predicted", y="Actual", color="Count"),
@@ -172,9 +167,8 @@ if clf:
                        title=f"Confusion Matrix - {selected_model}")
     st.plotly_chart(fig_cm, use_container_width=True)
 
-# -------------------- PREDICTION SECTION --------------------
+# -------------------- PREDICTION --------------------
 st.header("🎯 Try Prediction")
-
 with st.form("prediction_form"):
     calories = st.number_input("Calories", min_value=0, step=1)
     protein = st.number_input("Protein", min_value=0, step=1)
@@ -193,7 +187,6 @@ with st.form("prediction_form"):
     is_gluten_free = st.checkbox("Is Gluten Free?")
 
     submitted = st.form_submit_button("Predict")
-
     if submitted:
         input_df = pd.DataFrame([{
             "Calories": calories, "Protein": protein, "Fat": fat, "Carbohydrates": carbs,
@@ -222,8 +215,7 @@ with st.form("prediction_form"):
 
             if hasattr(clf, "predict_proba"):
                 proba = clf.predict_proba(input_pca)[0]
-                if pred_class < len(proba):
-                    confidence = proba[pred_class] * 100
+                confidence = proba[pred_class] * 100 if pred_class < len(proba) else None
 
             all_predictions.append({"Model": model_name, "Prediction": pred_label,
                                     "Confidence (%)": round(confidence,2) if confidence else None})
